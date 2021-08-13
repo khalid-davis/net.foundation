@@ -1,0 +1,1 @@
+/usr/bin/cc -g   CMakeFiles/epoll_example.dir/epoll.c.o  -o epoll_example 

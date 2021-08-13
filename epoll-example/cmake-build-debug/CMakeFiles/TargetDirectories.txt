@@ -1,0 +1,3 @@
+/home/projector-user/workspace/ccode/unix/epoll-example/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/projector-user/workspace/ccode/unix/epoll-example/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/projector-user/workspace/ccode/unix/epoll-example/cmake-build-debug/CMakeFiles/epoll_example.dir
