@@ -4,12 +4,14 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
+	"fmt"
 	ci "github.com/libp2p/go-libp2p-core/crypto"
 	"github.com/libp2p/go-libp2p-core/peer"
 	"github.com/libp2p/go-libp2p-core/sec"
 	"io/ioutil"
 	"log"
 	"net"
+	"strings"
 	"sync"
 )
 
@@ -70,7 +72,9 @@ func (t *CATransport) SecureInbound(ctx context.Context, insecure net.Conn) (sec
 
 
 func (t *CATransport) SecureOutbound(ctx context.Context, insecure net.Conn, p peer.ID) (sec.SecureConn, error) {
-	config, _:= t.caIdentity.ConfigForPeer(p)
+	// 这里需要设置下config.ServerName
+	addr := insecure.RemoteAddr().String()
+	config, _:= t.caIdentity.ConfigForPeer(p, addr)
 	cs, err := t.handshake(ctx, tls.Client(insecure, config))
 	if err != nil {
 		insecure.Close()
@@ -164,7 +168,7 @@ func NewCAIdentity(cert tls.Certificate, certPoll *x509.CertPool) (*CAIdentity, 
 	return &CAIdentity{
 		config: tls.Config{
 			Certificates: []tls.Certificate{cert},
-			ServerName: "127.0.0.1", // 原本的tls里面是判断为空会去填充
+			//ServerName: "127.0.0.1", // 原本的tls里面是判断为空会去填充
 			//InsecureSkipVerify: true,
 			// for server
 			ClientAuth: tls.RequireAndVerifyClientCert,
@@ -176,15 +180,35 @@ func NewCAIdentity(cert tls.Certificate, certPoll *x509.CertPool) (*CAIdentity, 
 }
 
 func (i *CAIdentity) ConfigForAny() (*tls.Config, <-chan ci.PubKey) {
-	return i.ConfigForPeer("")
+	return i.ConfigForPeer("", "")
 }
 
-func (i *CAIdentity) ConfigForPeer(remote peer.ID) (*tls.Config, <-chan ci.PubKey) {
+func (i *CAIdentity) ConfigForPeer(remote peer.ID, addr string) (*tls.Config, <-chan ci.PubKey) {
+
+
 	keyCh := make(chan ci.PubKey, 1)
 	// We need to check the peer ID in the VerifyPeerCertificate callback.
 	// The tls.Config it is also used for listening, and we might also have concurrent dials.
 	// Clone it so we can check for the specific peer ID we're dialing here.
 	conf := i.config.Clone()
+
+	fmt.Println("addr: ", addr)
+
+	// set the server name
+	if addr != "" {
+		colonPos := strings.LastIndex(addr, ":")
+		if colonPos == -1 {
+			colonPos = len(addr)
+		}
+		hostname := addr[:colonPos]
+
+		// If no ServerName is set, infer the ServerName
+		// from the hostname we're connecting to.
+		if conf.ServerName == "" {
+			conf.ServerName = hostname
+		}
+	}
+
 	// We're using InsecureSkipVerify, so the verifiedChains parameter will always be empty.
 	// We need to parse the certificates ourselves from the raw certs.
 	//conf.VerifyPeerCertificate = func(rawCerts [][]byte, _ [][]*x509.Certificate) error {

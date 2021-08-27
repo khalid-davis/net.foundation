@@ -4,12 +4,7 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d6bf210a-1ab2-424a-be24-e449b87e60b1" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/cmd/tlsdiag_ca/client/client.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/cmd/tlsdiag_ca/key.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/cmd/tlsdiag_ca/server/server.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/tlsdiag.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/tlsdiag.go" afterDir="false" />
-    </list>
+    <list default="true" id="d6bf210a-1ab2-424a-be24-e449b87e60b1" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -22,14 +17,15 @@
       </list>
     </option>
   </component>
-  <component name="GOROOT" url="file://$PROJECT_DIR$/../../../../programe-software/go" />
+  <component name="GOROOT" url="file://$PROJECT_DIR$/../../../../../programe-software/go" />
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
   <component name="GoLibraries">
     <option name="indexEntireGoPath" value="false" />
   </component>
   <component name="ProjectId" id="1x7rRmUspMhYvXtqaiTU2oEAqQF" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -43,7 +39,8 @@
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.modules.go.list.on.any.changes.was.set" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/cmd/tlsdiag_ca/client" />
+    <property name="go.vendoring.notification.had.been.shown" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
