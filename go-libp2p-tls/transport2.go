@@ -9,7 +9,6 @@ import (
 	"crypto/x509"
 	"errors"
 	"fmt"
-	"github.com/gogo/protobuf/proto"
 	ci "github.com/libp2p/go-libp2p-core/crypto"
 	pb "github.com/libp2p/go-libp2p-core/crypto/pb"
 	"github.com/libp2p/go-libp2p-core/peer"
@@ -274,7 +273,7 @@ func (pk *RsaPublicKey) Type() pb.KeyType {
 
 // Bytes returns protobuf bytes of a public key
 func (pk *RsaPublicKey) Bytes() ([]byte, error) {
-	return MarshalPublicKey(pk)
+	return ci.MarshalPublicKey(pk)
 }
 
 func (pk *RsaPublicKey) Raw() ([]byte, error) {
@@ -306,28 +305,4 @@ func basicEquals(k1, k2 ci.Key) bool {
 		return false
 	}
 	return subtle.ConstantTimeCompare(a, b) == 1
-}
-
-// MarshalPublicKey converts a public key object into a protobuf serialized
-// public key
-func MarshalPublicKey(k ci.PubKey) ([]byte, error) {
-	pbmes, err := PublicKeyToProto(k)
-	if err != nil {
-		return nil, err
-	}
-
-	return proto.Marshal(pbmes)
-}
-
-// PublicKeyToProto converts a public key object into an unserialized
-// protobuf PublicKey message.
-func PublicKeyToProto(k ci.PubKey) (*pb.PublicKey, error) {
-	pbmes := new(pb.PublicKey)
-	pbmes.Type = k.Type()
-	data, err := k.Raw()
-	if err != nil {
-		return nil, err
-	}
-	pbmes.Data = data
-	return pbmes, nil
 }

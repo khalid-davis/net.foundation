@@ -1,0 +1,6 @@
+subjectAltName=@alt_names
+[alt_names]
+DNS.1 = www.my.com
+DNS.2 = www.alone.com
+IP.1 = 192.168.0.38
+IP.2 = 127.0.0.1
