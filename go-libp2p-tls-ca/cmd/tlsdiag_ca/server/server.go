@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/libp2p/go-libp2p-core/peer"
-	libp2ptls "github.com/libp2p/go-libp2p-tls-ca"
+	libp2ptlsca "github.com/libp2p/go-libp2p-tls-ca"
 )
 
 const (
@@ -53,7 +53,8 @@ func StartServer() error {
 		return err
 	}
 	fmt.Printf(" Peer ID: %s\n", id.Pretty())
-	tp, err := libp2ptls.New(priv, certFile, keyFile, caFile)
+	libp2ptlsca.Init(caFile, certFile, keyFile)
+	tp, err := libp2ptlsca.New(priv)
 	if err != nil {
 		return err
 	}
@@ -80,7 +81,7 @@ func StartServer() error {
 	}
 }
 
-func handleConn(tp *libp2ptls.Transport, conn net.Conn) error {
+func handleConn(tp *libp2ptlsca.Transport, conn net.Conn) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	sconn, err := tp.SecureInbound(ctx, conn)

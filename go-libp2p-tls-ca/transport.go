@@ -21,13 +21,30 @@ import (
 // ID is the protocol ID
 const ID = "/tls-ca/1.0.0"
 
+type Config struct {
+	caFile string
+	certFile string
+	keyFile string
+}
+
+var config Config
+
 type Transport struct {
 	identity  *Identity
 	localPeer peer.ID
 	privKey   libp2pcrypto.PrivKey
 }
 
-func New(key libp2pcrypto.PrivKey, certFile, keyFile, caFile string) (*Transport, error) {
+func Init(caFile, certFile, keyFile string) {
+	config = Config{
+		caFile:   caFile,
+		certFile: certFile,
+		keyFile:  keyFile,
+	}
+}
+
+// New 没有其他的传输参数手段，只能这么做
+func New(key libp2pcrypto.PrivKey) (*Transport, error) {
 	id, err := peer.IDFromPrivateKey(key)
 	if err != nil {
 		return nil, err
@@ -38,14 +55,14 @@ func New(key libp2pcrypto.PrivKey, certFile, keyFile, caFile string) (*Transport
 	}
 
 	var cert tls.Certificate
-	cert, err = tls.LoadX509KeyPair(certFile, keyFile)
+	cert, err = tls.LoadX509KeyPair(config.certFile, config.keyFile)
 	if err != nil {
 		log.Println(err)
 		return nil, err
 	}
 
 	var clientCertPool *x509.CertPool
-	caCertBytes, err := ioutil.ReadFile(caFile)
+	caCertBytes, err := ioutil.ReadFile(config.caFile)
 	if err != nil {
 		panic("unable to read client.pem")
 	}
