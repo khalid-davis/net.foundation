@@ -18,10 +18,16 @@ import (
 const (
 	keyFile = "./cmd/tlsdiag_ca/server/ecdsa/server.key"
 	certFile = "./cmd/tlsdiag_ca/server/ecdsa/server.crt"
-	//caFile = "./cmd/tlsdiag_ca/ca-kubeedge.crt"
+	caFile   = "./cmd/tlsdiag_ca/ca.crt"
+
 	//keyFile  = "./cmd/tlsdiag_ca/server/server.key"
 	//certFile = "./cmd/tlsdiag_ca/server/server.crt"
-	caFile   = "./cmd/tlsdiag_ca/ca.crt"
+	//caFile   = "./cmd/tlsdiag_ca/ca.crt"
+
+	//keyFile = "./cmd/tlsdiag_ca/server/ca-server/server.key"
+	//certFile = "./cmd/tlsdiag_ca/server/ca-server/server.crt"
+	//caFile   = "./cmd/tlsdiag_ca/ca-ca-server.crt"
+
 )
 
 func StartServer() error {

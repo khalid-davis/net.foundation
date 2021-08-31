@@ -71,6 +71,7 @@ func (i *Identity) ConfigForPeer(remote peer.ID, addr string) (*tls.Config, <-ch
 			chain[i] = cert
 		}
 
+
 		//pubKey, err := PubKeyFromCertChain(chain)
 		// todo kubeedge里面是ecdsapublic
 		//rsaPublicKey := chain[0].PublicKey.(*ecdsa.PublicKey)
