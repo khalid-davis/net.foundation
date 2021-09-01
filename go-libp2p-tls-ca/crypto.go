@@ -9,6 +9,7 @@ import (
 	"crypto/x509"
 	"fmt"
 	"strings"
+	"time"
 
 	libp2pcrypto "github.com/libp2p/go-libp2p-core/crypto"
 	pb "github.com/libp2p/go-libp2p-core/crypto/pb"
@@ -29,7 +30,41 @@ func NewIdentity(cert tls.Certificate, certPoll *x509.CertPool) (*Identity, erro
 			ClientAuth: tls.RequireAndVerifyClientCert,
 			ClientCAs:  certPoll,
 			// for client
+			// client need to skip hostname verify
 			RootCAs: certPoll,
+			InsecureSkipVerify: true, // Not actually skipping, we check the cert in VerifyPeerCertificate
+			VerifyPeerCertificate: func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
+				// Code copy/pasted and adapted from
+				// https://github.com/golang/go/blob/81555cb4f3521b53f9de4ce15f64b77cc9df61b9/src/crypto/tls/handshake_client.go#L327-L344, but adapted to skip the hostname verification.
+				// See https://github.com/golang/go/issues/21971#issuecomment-412836078.
+
+				// If this is the first handshake on a connection, process and
+				// (optionally) verify the server's certificates.
+				certs := make([]*x509.Certificate, len(rawCerts))
+				for i, asn1Data := range rawCerts {
+					cert, err := x509.ParseCertificate(asn1Data)
+					if err != nil {
+						return fmt.Errorf("failed to parse certificate from server: %s", err.Error())
+					}
+					certs[i] = cert
+				}
+
+				opts := x509.VerifyOptions{
+					Roots:         certPoll,
+					CurrentTime:   time.Now(),
+					DNSName:       "", // <- skip hostname verification
+					Intermediates: x509.NewCertPool(),
+				}
+
+				for i, cert := range certs {
+					if i == 0 {
+						continue
+					}
+					opts.Intermediates.AddCert(cert)
+				}
+				_, err := certs[0].Verify(opts)
+				return err
+			},
 		},
 	}, nil
 }
