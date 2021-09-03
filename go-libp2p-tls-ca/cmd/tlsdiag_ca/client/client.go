@@ -16,9 +16,10 @@ import (
 )
 
 const (
-	keyFile = "./cmd/tlsdiag_ca/client/ecdsa/client.key"
-	certFile = "./cmd/tlsdiag_ca/client/ecdsa/client.crt"
-	caFile   = "./cmd/tlsdiag_ca/ca.crt"
+	keyFile = "./cmd/tlsdiag_ca/client/kubeedge/client.key"
+	certFile = "./cmd/tlsdiag_ca/client/kubeedge/client.crt"
+	caFile   = "./cmd/tlsdiag_ca/client/fail/rootCA.crt" //real ca
+	//caFile   = "./cmd/tlsdiag_ca/client/fail/ca.crt" // fake ca
 
 	//keyFile  = "./cmd/tlsdiag_ca/client/client.key"
 	//certFile = "./cmd/tlsdiag_ca/client/client.crt"

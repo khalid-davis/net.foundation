@@ -8,7 +8,6 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"strings"
 	"time"
 
 	libp2pcrypto "github.com/libp2p/go-libp2p-core/crypto"
@@ -33,38 +32,6 @@ func NewIdentity(cert tls.Certificate, certPoll *x509.CertPool) (*Identity, erro
 			// client need to skip hostname verify
 			RootCAs: certPoll,
 			InsecureSkipVerify: true, // Not actually skipping, we check the cert in VerifyPeerCertificate
-			VerifyPeerCertificate: func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
-				// Code copy/pasted and adapted from
-				// https://github.com/golang/go/blob/81555cb4f3521b53f9de4ce15f64b77cc9df61b9/src/crypto/tls/handshake_client.go#L327-L344, but adapted to skip the hostname verification.
-				// See https://github.com/golang/go/issues/21971#issuecomment-412836078.
-
-				// If this is the first handshake on a connection, process and
-				// (optionally) verify the server's certificates.
-				certs := make([]*x509.Certificate, len(rawCerts))
-				for i, asn1Data := range rawCerts {
-					cert, err := x509.ParseCertificate(asn1Data)
-					if err != nil {
-						return fmt.Errorf("failed to parse certificate from server: %s", err.Error())
-					}
-					certs[i] = cert
-				}
-
-				opts := x509.VerifyOptions{
-					Roots:         certPoll,
-					CurrentTime:   time.Now(),
-					DNSName:       "", // <- skip hostname verification
-					Intermediates: x509.NewCertPool(),
-				}
-
-				for i, cert := range certs {
-					if i == 0 {
-						continue
-					}
-					opts.Intermediates.AddCert(cert)
-				}
-				_, err := certs[0].Verify(opts)
-				return err
-			},
 		},
 	}, nil
 }
@@ -79,19 +46,19 @@ func (i *Identity) ConfigForPeer(remote peer.ID, addr string) (*tls.Config, <-ch
 	conf := i.config.Clone()
 
 	// set the server name
-	if addr != "" {
-		colonPos := strings.LastIndex(addr, ":")
-		if colonPos == -1 {
-			colonPos = len(addr)
-		}
-		hostname := addr[:colonPos]
-
-		// If no ServerName is set, infer the ServerName
-		// from the hostname we're connecting to.
-		if conf.ServerName == "" {
-			conf.ServerName = hostname
-		}
-	}
+	//if addr != "" {
+	//	colonPos := strings.LastIndex(addr, ":")
+	//	if colonPos == -1 {
+	//		colonPos = len(addr)
+	//	}
+	//	hostname := addr[:colonPos]
+	//
+	//	// If no ServerName is set, infer the ServerName
+	//	// from the hostname we're connecting to.
+	//	if conf.ServerName == "" {
+	//		conf.ServerName = hostname
+	//	}
+	//}
 
 	// fetch the public key from the certs
 	conf.VerifyPeerCertificate = func(rawCerts [][]byte, _ [][]*x509.Certificate) error {
@@ -106,13 +73,37 @@ func (i *Identity) ConfigForPeer(remote peer.ID, addr string) (*tls.Config, <-ch
 			chain[i] = cert
 		}
 
+		// Code copy/pasted and adapted from
+		// https://github.com/golang/go/blob/81555cb4f3521b53f9de4ce15f64b77cc9df61b9/src/crypto/tls/handshake_client.go#L327-L344, but adapted to skip the hostname verification.
+		// See https://github.com/golang/go/issues/21971#issuecomment-412836078.
+
+		// If this is the first handshake on a connection, process and
+		// (optionally) verify the server's certificates.
+		fmt.Println("verify------------")
+		opts := x509.VerifyOptions{
+			Roots:         conf.ClientCAs,
+			CurrentTime:   time.Now(),
+			DNSName:       "", // <- skip hostname verification
+			Intermediates: x509.NewCertPool(),
+		}
+
+		for i, cert := range chain {
+			if i == 0 {
+				continue
+			}
+			opts.Intermediates.AddCert(cert)
+		}
+		_, err := chain[0].Verify(opts)
+		if err != nil {
+			return err
+		}
 
 		//pubKey, err := PubKeyFromCertChain(chain)
 		// todo kubeedge里面是ecdsapublic
 		//rsaPublicKey := chain[0].PublicKey.(*ecdsa.PublicKey)
-		//tmp := chain[0].PublicKey.(*rsa.PublicKey)
+		//fail := chain[0].PublicKey.(*rsa.PublicKey)
 		//pubKey := &RsaPublicKey{
-		//	k: *tmp,
+		//	k: *fail,
 		//}
 		tmp := chain[0].PublicKey.(*ecdsa.PublicKey)
 		pubKey := &ECDSAPublicKey{

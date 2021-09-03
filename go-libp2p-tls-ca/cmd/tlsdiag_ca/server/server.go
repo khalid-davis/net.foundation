@@ -16,9 +16,14 @@ import (
 )
 
 const (
-	keyFile = "./cmd/tlsdiag_ca/server/ecdsa/server.key"
-	certFile = "./cmd/tlsdiag_ca/server/ecdsa/server.crt"
-	caFile   = "./cmd/tlsdiag_ca/ca.crt"
+	//keyFile = "./cmd/tlsdiag_ca/server/fail/server.key"
+	//certFile = "./cmd/tlsdiag_ca/server/fail/server.crt"
+	//caFile   = "./cmd/tlsdiag_ca/server/fail/rootCA.crt"
+
+	keyFile = "./cmd/tlsdiag_ca/server/edgemesh-server/server.key"
+	certFile = "./cmd/tlsdiag_ca/server/edgemesh-server/server.crt"
+	caFile   = "./cmd/tlsdiag_ca/server/edgemesh-server/rootCA.crt"
+
 
 	//keyFile  = "./cmd/tlsdiag_ca/server/server.key"
 	//certFile = "./cmd/tlsdiag_ca/server/server.crt"
@@ -59,7 +64,7 @@ func StartServer() error {
 		return err
 	}
 
-	ln, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", *port))
+	ln, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%d", *port))
 	if err != nil {
 		return err
 	}
